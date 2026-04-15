@@ -1,0 +1,40 @@
+model Plugin {
+  id String @id @default(uuid()) @db.Uuid
+
+  packageName String @db.VarChar(255)
+  name String @db.VarChar(255)
+  description String @db.Text
+  icon String @db.VarChar(255)
+  background String @db.VarChar(255)
+  tags String[] @db.VarChar(255)
+
+  createdAt DateTime @default(now()) @db.Timestamp
+  updatedAt DateTime @updatedAt @db.Timestamp
+
+  versions PluginVersion[] @relation("PluginVersions")
+
+  latestPluginVersion PluginVersion? @relation("PluginLatestVersion", fields: [latestPluginVersionId], references: [id])
+  latestPluginVersionId String? @unique @db.Uuid
+
+  @@unique([packageName])
+  @@map("plugins")
+}
+
+model PluginVersion {
+  id String @id @default(uuid()) @db.Uuid
+
+  pluginManifest Json
+
+  pluginId String @db.Uuid
+  plugin Plugin @relation("PluginVersions", fields: [pluginId], references: [id], onDelete: Cascade)
+
+  pluginMarkedAsLatestBy Plugin? @relation("PluginLatestVersion")
+
+  version String @db.VarChar(255)
+
+  createdAt DateTime @default(now()) @db.Timestamp
+  updatedAt DateTime @updatedAt @db.Timestamp
+
+  @@unique([pluginId, version])
+  @@map("plugin_versions")
+}

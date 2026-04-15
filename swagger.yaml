@@ -1,0 +1,769 @@
+openapi: 3.1.0
+info:
+  title: Snipet Catalog API
+  description: API documentation for Snipet Catalog
+  version: 1.0.0
+components:
+  schemas: {}
+paths:
+  /api/health:
+    get:
+      tags:
+        - Health
+      description: Health check endpoint
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                required:
+                  - status
+                additionalProperties: false
+  /api/version:
+    get:
+      tags:
+        - System
+      description: Version endpoint
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                required:
+                  - version
+                additionalProperties: false
+  /api/plugins:
+    get:
+      tags:
+        - Plugins
+      description: List plugins
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: skip
+        - schema:
+            type: number
+          in: query
+          name: take
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                    packageName:
+                      type: string
+                      minLength: 1
+                      maxLength: 255
+                    name:
+                      type: string
+                      minLength: 1
+                      maxLength: 255
+                    description:
+                      type: string
+                      minLength: 1
+                    icon:
+                      type: string
+                      minLength: 1
+                      maxLength: 255
+                    background:
+                      type: string
+                      minLength: 1
+                      maxLength: 255
+                    tags:
+                      default: []
+                      type: array
+                      items:
+                        type: string
+                        minLength: 1
+                        maxLength: 255
+                    latestPluginVersionId:
+                      anyOf:
+                        - type: string
+                          format: uuid
+                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                        - type: "null"
+                    createdAt:
+                      type: string
+                    updatedAt:
+                      type: string
+                  required:
+                    - id
+                    - packageName
+                    - name
+                    - description
+                    - icon
+                    - background
+                    - tags
+                    - latestPluginVersionId
+                    - createdAt
+                    - updatedAt
+                  additionalProperties: false
+        "500":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+    post:
+      tags:
+        - Plugins
+      description: Create plugin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                packageName:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                description:
+                  type: string
+                  minLength: 1
+                icon:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                background:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                tags:
+                  default: []
+                  type: array
+                  items:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                version:
+                  type: object
+                  properties:
+                    version:
+                      type: string
+                      minLength: 1
+                      maxLength: 255
+                    pluginManifest: {}
+                  required:
+                    - version
+                    - pluginManifest
+              required:
+                - packageName
+                - name
+                - description
+                - icon
+                - background
+                - version
+      responses:
+        "201":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                  packageName:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  name:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  description:
+                    type: string
+                    minLength: 1
+                  icon:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  background:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  tags:
+                    default: []
+                    type: array
+                    items:
+                      type: string
+                      minLength: 1
+                      maxLength: 255
+                  latestPluginVersionId:
+                    anyOf:
+                      - type: string
+                        format: uuid
+                        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                      - type: "null"
+                  createdAt:
+                    type: string
+                  updatedAt:
+                    type: string
+                required:
+                  - id
+                  - packageName
+                  - name
+                  - description
+                  - icon
+                  - background
+                  - tags
+                  - latestPluginVersionId
+                  - createdAt
+                  - updatedAt
+                additionalProperties: false
+        "409":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+        "500":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+  /api/plugins/{id}:
+    get:
+      tags:
+        - Plugins
+      description: Get plugin by id
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          in: path
+          name: id
+          required: true
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                  packageName:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  name:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  description:
+                    type: string
+                    minLength: 1
+                  icon:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  background:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  tags:
+                    default: []
+                    type: array
+                    items:
+                      type: string
+                      minLength: 1
+                      maxLength: 255
+                  latestPluginVersionId:
+                    anyOf:
+                      - type: string
+                        format: uuid
+                        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                      - type: "null"
+                  createdAt:
+                    type: string
+                  updatedAt:
+                    type: string
+                required:
+                  - id
+                  - packageName
+                  - name
+                  - description
+                  - icon
+                  - background
+                  - tags
+                  - latestPluginVersionId
+                  - createdAt
+                  - updatedAt
+                additionalProperties: false
+        "404":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+        "500":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+    patch:
+      tags:
+        - Plugins
+      description: Update plugin by id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                packageName:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                description:
+                  type: string
+                  minLength: 1
+                icon:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                background:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                tags:
+                  default: []
+                  type: array
+                  items:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                version:
+                  type: object
+                  properties:
+                    version:
+                      type: string
+                      minLength: 1
+                      maxLength: 255
+                    pluginManifest: {}
+                    setAsLatest:
+                      type: boolean
+                  required:
+                    - version
+                    - pluginManifest
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          in: path
+          name: id
+          required: true
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                  packageName:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  name:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  description:
+                    type: string
+                    minLength: 1
+                  icon:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  background:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  tags:
+                    default: []
+                    type: array
+                    items:
+                      type: string
+                      minLength: 1
+                      maxLength: 255
+                  latestPluginVersionId:
+                    anyOf:
+                      - type: string
+                        format: uuid
+                        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                      - type: "null"
+                  createdAt:
+                    type: string
+                  updatedAt:
+                    type: string
+                required:
+                  - id
+                  - packageName
+                  - name
+                  - description
+                  - icon
+                  - background
+                  - tags
+                  - latestPluginVersionId
+                  - createdAt
+                  - updatedAt
+                additionalProperties: false
+        "404":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+        "409":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+        "500":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+    delete:
+      tags:
+        - Plugins
+      description: Delete plugin by id
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          in: path
+          name: id
+          required: true
+      responses:
+        "204":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: "null"
+        "404":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+        "500":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+  /api/plugins/release:
+    post:
+      tags:
+        - Plugins
+        - Releases
+      description: Release a plugin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pluginId:
+                  type: string
+                  format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                version:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                pluginManifest: {}
+              required:
+                - pluginId
+                - version
+                - pluginManifest
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          in: path
+          name: pluginId
+          required: true
+      responses:
+        "201":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                  packageName:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  name:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  description:
+                    type: string
+                    minLength: 1
+                  icon:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  background:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  tags:
+                    default: []
+                    type: array
+                    items:
+                      type: string
+                      minLength: 1
+                      maxLength: 255
+                  latestPluginVersionId:
+                    anyOf:
+                      - type: string
+                        format: uuid
+                        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                      - type: "null"
+                  createdAt:
+                    type: string
+                  updatedAt:
+                    type: string
+                required:
+                  - id
+                  - packageName
+                  - name
+                  - description
+                  - icon
+                  - background
+                  - tags
+                  - latestPluginVersionId
+                  - createdAt
+                  - updatedAt
+                additionalProperties: false
+        "404":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+        "500":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+  /api/plugins/release/{id}:
+    delete:
+      tags:
+        - Plugins
+      description: Delete a plugin release
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          in: path
+          name: id
+          required: true
+      responses:
+        "204":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: "null"
+        "404":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
+        "500":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                  details: {}
+                required:
+                  - error
+                additionalProperties: false
