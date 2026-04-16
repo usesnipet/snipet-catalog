@@ -7,9 +7,6 @@ import {
   updatePluginSchema,
   createPluginVersionSchema,
   pluginSchema,
-  CreatePlugin,
-  UpdatePlugin,
-  CreatePluginVersion,
 } from "@/core/schemas/index.js";
 import { sendResult } from "@/server/http-errors/send-result.js";
 import {
@@ -67,93 +64,116 @@ export function createPluginsController(
     },
   });
 
-  app.post("/api/plugins", {
-    schema: {
-      description: "Create plugin",
-      tags: ["Plugins"],
-      body: createPluginSchema,
-      response: {
-        201: pluginSchema,
-        409: errorResponseSchema,
-        500: errorResponseSchema,
+  app.post(
+    "/api/plugins",
+    {
+      onRequest: [app.basicAuth],
+      schema: {
+        security: [{ basicAuth: [] }],
+        description: "Create plugin",
+        tags: ["Plugins"],
+        body: createPluginSchema,
+        response: {
+          201: pluginSchema,
+          409: errorResponseSchema,
+          500: errorResponseSchema,
+        },
       },
     },
-    handler: async (req: FastifyRequest<{ Body: CreatePlugin }>, reply) => {
+    async (req, reply) => {
       const result = await pluginService.create(req.body);
       return sendResult(reply, logger, result, { okStatus: 201 });
     },
-  });
+  );
 
-  app.patch("/api/plugins/:id", {
-    schema: {
-      description: "Update plugin by id",
-      tags: ["Plugins"],
-      params: idParamsSchema,
-      body: updatePluginSchema,
-      response: {
-        200: pluginSchema,
-        404: errorResponseSchema,
-        409: errorResponseSchema,
-        500: errorResponseSchema,
+  app.patch(
+    "/api/plugins/:id",
+    {
+      onRequest: [app.basicAuth],
+      schema: {
+        security: [{ basicAuth: [] }],
+        description: "Update plugin by id",
+        tags: ["Plugins"],
+        params: idParamsSchema,
+        body: updatePluginSchema,
+        response: {
+          200: pluginSchema,
+          404: errorResponseSchema,
+          409: errorResponseSchema,
+          500: errorResponseSchema,
+        },
       },
     },
-    handler: async (req: FastifyRequest<{ Params: IdParams; Body: UpdatePlugin }>, reply) => {
+    async (req, reply) => {
       const result = await pluginService.updateById(req.params.id, req.body);
       return sendResult(reply, logger, result);
     },
-  });
+  );
 
-  app.delete("/api/plugins/:id", {
-    schema: {
-      description: "Delete plugin by id",
-      tags: ["Plugins"],
-      params: idParamsSchema,
-      response: {
-        204: z.null(),
-        404: errorResponseSchema,
-        500: errorResponseSchema,
+  app.delete(
+    "/api/plugins/:id",
+    {
+      onRequest: [app.basicAuth],
+      schema: {
+        security: [{ basicAuth: [] }],
+        description: "Delete plugin by id",
+        tags: ["Plugins"],
+        params: idParamsSchema,
+        response: {
+          204: z.null(),
+          404: errorResponseSchema,
+          500: errorResponseSchema,
+        },
       },
     },
-    handler: async (req: FastifyRequest<{ Params: IdParams }>, reply) => {
+    async (req, reply) => {
       const result = await pluginService.deleteById(req.params.id);
       return sendResult(reply, logger, result, { okStatus: 204 });
     },
-  });
+  );
 
-
-  app.post("/api/plugins/release", {
-    schema: {
-      description: "Release a plugin",
-      tags: ["Plugins", "Releases"],
-      params: z.object({ pluginId: z.uuid() }),
-      body: createPluginVersionSchema,
-      response: {
-        201: pluginSchema,
-        404: errorResponseSchema,
-        500: errorResponseSchema,
+  app.post(
+    "/api/plugins/release",
+    {
+      onRequest: [app.basicAuth],
+      schema: {
+        security: [{ basicAuth: [] }],
+        description: "Release a plugin",
+        tags: ["Plugins"],
+        body: createPluginVersionSchema,
+        response: {
+          201: pluginSchema,
+          404: errorResponseSchema,
+          500: errorResponseSchema,
+        },
       },
     },
-    handler: async (req: FastifyRequest<{ Body: CreatePluginVersion }>, reply) => {
+    async (req, reply) => {
       const result = await pluginService.release(req.body);
-      return sendResult(reply, logger, result);
+      return sendResult(reply, logger, result, { okStatus: 201 });
     },
-  });
+  );
 
-  app.delete("/api/plugins/release/:id", {
-    schema: {
-      description: "Delete a plugin release",
-      tags: ["Plugins"],
-      params: idParamsSchema,
-      response: {
-        204: z.null(),
-        404: errorResponseSchema,
-        500: errorResponseSchema,
-      },
+  app.delete(
+    "/api/plugins/release/:id",
+    {
+      onRequest: [app.basicAuth],
+      schema: {
+        security: [{ basicAuth: [] }],
+        description: "Delete a plugin release",
+        tags: ["Plugins"],
+        params: idParamsSchema,
+        response: {
+          204: z.null(),
+          404: errorResponseSchema,
+          500: errorResponseSchema,
+        },
+      }
     },
-    handler: async (req: FastifyRequest<{ Params: IdParams }>, reply) => {
+    async (req, reply) => {
       const result = await pluginService.deleteRelease(req.params.id);
       return sendResult(reply, logger, result, { okStatus: 204 });
     },
-  });
+  );
 }
 

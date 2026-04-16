@@ -4,6 +4,10 @@ info:
   description: API documentation for Snipet Catalog
   version: 1.0.0
 components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
   schemas: {}
 paths:
   /api/health:
@@ -188,6 +192,8 @@ paths:
                 - icon
                 - background
                 - version
+      security:
+        - basicAuth: []
       responses:
         "201":
           description: Default Response
@@ -439,6 +445,8 @@ paths:
           in: path
           name: id
           required: true
+      security:
+        - basicAuth: []
       responses:
         "200":
           description: Default Response
@@ -556,6 +564,8 @@ paths:
           in: path
           name: id
           required: true
+      security:
+        - basicAuth: []
       responses:
         "204":
           description: Default Response
@@ -597,7 +607,6 @@ paths:
     post:
       tags:
         - Plugins
-        - Releases
       description: Release a plugin
       requestBody:
         required: true
@@ -619,14 +628,8 @@ paths:
                 - pluginId
                 - version
                 - pluginManifest
-      parameters:
-        - schema:
-            type: string
-            format: uuid
-            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-          in: path
-          name: pluginId
-          required: true
+      security:
+        - basicAuth: []
       responses:
         "201":
           description: Default Response
@@ -730,6 +733,8 @@ paths:
           in: path
           name: id
           required: true
+      security:
+        - basicAuth: []
       responses:
         "204":
           description: Default Response

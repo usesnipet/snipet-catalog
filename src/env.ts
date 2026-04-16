@@ -29,6 +29,17 @@ const envSchema = z.object({
     .default("server,worker,cron")
     .transform((s) => s.split(",").map((x) => x.trim().toLowerCase() as "server" | "worker" | "cron")),
 
+  /**
+   * The basic auth username.
+   * @example "admin"
+   */
+  BASIC_AUTH_USERNAME: z.string().default("admin"),
+
+  /**
+   * The basic auth password.
+   * @example "123"
+   */
+  BASIC_AUTH_PASSWORD: z.string().default("admin"),
 
   /**
    * The log level.
@@ -42,20 +53,6 @@ const envSchema = z.object({
    * @example "my-master-password"
    */
   ENCRYPTION_MASTER_PASSWORD: z.string().min(8).default("password"),
-
-  //#region Plugins
-  /**
-   * Path to directory containing installed plugins (managed by Snipet).
-   * @default "./plugins"
-   */
-  PLUGINS_PATH: z.string().default("./plugins"),
-
-
-  /**
-   * Enables plugin debug logs persistence and reading via PluginManager.readLogs.
-   * @default false
-   */
-  DEBUG_PLUGINS: z.coerce.boolean().default(false),
 
   //#region PG-BOSS
   /**

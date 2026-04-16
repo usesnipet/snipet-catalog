@@ -1,4 +1,5 @@
 import { env } from "@/env.js";
+import fastifyBasicAuth from '@fastify/basic-auth';
 import { createLogger } from "@/logger.js";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
@@ -39,6 +40,14 @@ export async function bootstrapServer() {
         description: "API documentation for Snipet Catalog",
         version: "1.0.0",
       },
+      components: {
+        securitySchemes: {
+          basicAuth: {
+            type: 'http',
+            scheme: 'basic'
+          }
+        }
+      }
     },
     ...fastifyZodOpenApiTransformers,
   });
@@ -49,6 +58,17 @@ export async function bootstrapServer() {
       docExpansion: "list",
       deepLinking: true,
     },
+  });
+
+  await app.register(fastifyBasicAuth, {
+    validate(username, password, _req, reply, done) {
+      if (username !== env.BASIC_AUTH_USERNAME || password !== env.BASIC_AUTH_PASSWORD) {
+        reply.code(401).send({ error: "Invalid credentials" });
+        return;
+      }
+      done();
+    },
+    authenticate: true,
   });
 
   const logger = createLogger({ context: "server" });
