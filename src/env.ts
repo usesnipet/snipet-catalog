@@ -26,8 +26,8 @@ const envSchema = z.object({
    * @example "server,cron"
    */
   APPS: z.string()
-    .default("server,worker,cron")
-    .transform((s) => s.split(",").map((x) => x.trim().toLowerCase() as "server" | "worker" | "cron")),
+    .default("server")
+    .transform((s) => s.split(",").map((x) => x.trim().toLowerCase() as "server")),
 
   /**
    * The basic auth username.

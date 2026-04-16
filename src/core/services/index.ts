@@ -1,14 +1,10 @@
-import type { Dispatch } from "@/core/dispatch/index.js";
 import { Repositories } from "@/core/repositories/index.js";
-import { InfraProviders } from "@/infra/index.js";
 import { Logger } from "@/logger.js";
 import { createPluginService } from "./plugin.service.js";
 import { createSystemService } from "./system.service.js";
 
 type ServicesDeps = {
-  infra: InfraProviders;
   repositories: Repositories;
-  dispatch: Dispatch;
   logger: Logger;
 };
 

@@ -1,16 +1,10 @@
 import type { Logger } from "@/logger.js";
-import { ajvHttpErrors } from "./ajv.http-errors.js";
 import { dbHttpErrors } from "./db.http-errors.js";
-import { dispatchHttpErrors } from "./dispatch.http-errors.js";
-import { pluginsHttpErrors } from "./plugins.http-errors.js";
 import { systemHttpErrors } from "./system.http-errors.js";
 import type { HttpError, HttpErrorMapper } from "./types.js";
 
 const mappers: HttpErrorMapper[] = [
-  ajvHttpErrors,
-  dispatchHttpErrors,
   systemHttpErrors,
-  pluginsHttpErrors,
   dbHttpErrors,
 ];
 
