@@ -81,9 +81,11 @@ export async function bootstrapServer() {
   await app.listen({ port, host: "0.0.0.0" });
 
   const spec = app.swagger();
-  const swaggerPath = join(process.cwd(), "swagger.yaml");
-  await writeFile(swaggerPath, stringifyYaml(spec), "utf-8");
-  logger.info("Swagger spec written to swagger.yaml");
+  if (env.NODE_ENV === "development") {
+    const swaggerPath = join(process.cwd(), "swagger.yaml");
+    await writeFile(swaggerPath, stringifyYaml(spec), "utf-8");
+    logger.info("Swagger spec written to swagger.yaml");
+  }
 
   return async () => {
     await close();

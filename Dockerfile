@@ -1,65 +1,53 @@
-# ============================================
-# Stage 1: Dependencies
-# ============================================
-FROM node:22-alpine AS deps
-RUN corepack enable && corepack prepare pnpm@10.26.0 --activate
+FROM node:22-slim AS build
+
 WORKDIR /app
+
+# Native deps for modules like argon2/bcrypt
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN corepack enable && corepack prepare pnpm@10.26.0 --activate \
+  && pnpm install --frozen-lockfile
 
-# ============================================
-# Stage 2: Build
-# ============================================
-FROM deps AS builder
-WORKDIR /app
-
-COPY . .
-
-# prisma generate precisa de DATABASE_URL (não conecta; só valida o config)
-ARG DATABASE_URL=postgresql://localhost:5432/db
-ENV DATABASE_URL=${DATABASE_URL}
-
-# Generate Prisma Client and build
-RUN pnpm exec prisma generate && pnpm run build
-
-# ============================================
-# Stage 3: Production dependencies
-# ============================================
-FROM node:22-alpine AS prod-deps
-RUN corepack enable && corepack prepare pnpm@10.26.0 --activate
-WORKDIR /app
-
-COPY package.json pnpm-lock.yaml ./
+COPY tsconfig.json tsup.config.ts prisma.config.ts ./
 COPY prisma ./prisma
-COPY prisma.config.ts ./
+COPY src ./src
 
+# prisma generate needs DATABASE_URL (doesn't connect; it only resolves config)
 ARG DATABASE_URL=postgresql://localhost:5432/db
 ENV DATABASE_URL=${DATABASE_URL}
 
-RUN pnpm install --frozen-lockfile --prod=false
-
-RUN pnpm exec prisma generate
-
-RUN pnpm prune --prod
+RUN pnpm exec prisma generate \
+  && pnpm run build \
+  && pnpm prune --prod
 
 
-# ============================================
-# Stage 4: Final image
-# ============================================
-FROM node:22-alpine AS runner
-
-RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
-USER nodejs
-
-WORKDIR /app
-
-COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./
+FROM node:22-slim AS runner
 
 ENV NODE_ENV=production
+ENV APPS=server
 
-EXPOSE 8852
+WORKDIR /app
 
-CMD ["node", "dist/index.js"]
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN useradd -m -u 10001 nodeapp
+
+COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/prisma.config.ts ./prisma.config.ts
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/prisma ./prisma
+
+RUN chown -R nodeapp:nodeapp /app
+
+EXPOSE 8853
+
+USER nodeapp
+
+CMD ["npm", "run", "start:prod"]

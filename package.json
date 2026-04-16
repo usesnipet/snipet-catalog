@@ -7,6 +7,7 @@
   "scripts": {
     "build": "tsup",
     "start": "node dist/index.js",
+    "start:prod": "prisma migrate deploy && node dist/index.js",
     "typecheck": "tsc --noEmit",
     "dev": "pnpm run typecheck && tsx watch src/index.ts",
     "dev:fast": "tsx watch src/index.ts",
